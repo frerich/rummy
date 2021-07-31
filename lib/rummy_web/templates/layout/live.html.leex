@@ -1,3 +1,15 @@
+<%= if @game_state in [:create_game, :join_game] do %>
+<header class="intro">
+  <p>Welcome</p>
+  <p>to</p>
+  <p><img src="<%= Routes.static_path(@socket, "/images/rummy.jpg") %>"></p>
+</header>
+<% else %>
+<header>
+  <img src="<%= Routes.static_path(@socket, "/images/rummy.jpg") %>">
+</header>
+<% end %>
+
 <main role="main" class="container">
   <p class="alert alert-info" role="alert"
     phx-click="lv:clear-flash"

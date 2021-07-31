@@ -12,7 +12,10 @@ defmodule Rummy.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: Rummy.PubSub},
       # Start the Endpoint (http/https)
-      RummyWeb.Endpoint
+      RummyWeb.Endpoint,
+      {DynamicSupervisor, strategy: :one_for_one, name: Rummy.Server.Supervisor},
+      {Registry, keys: :unique, name: Rummy.Server.Registry},
+      Rummy.ProcessMonitor
       # Start a worker by calling: Rummy.Worker.start_link(arg)
       # {Rummy.Worker, arg}
     ]

@@ -1,0 +1,64 @@
+<%= if @game_state == :create_game do %>
+<%= if @flash_message do %>
+  <h2>Oh noes!</h2>
+
+  <p><%= @flash_message %></p>
+<% end %>
+<p>Want to play a game?</p>
+
+<form phx-submit="start">
+  <input type="text" name="name" placeholder="Your name" autocomplete="off"/>
+  <button type="submit" phx-disable-with="Starting game...">Start Game</button>
+</form>
+<% end %>
+
+<%= if @game_state == :join_game do %>
+<p>Let's join a game.</p>
+
+<form phx-submit="join">
+  <input type="text" name="name" placeholder="Your name" autocomplete="off"/>
+  <button type="submit" phx-disable-with="Joining game...">Join Game</button>
+</form>
+<% end %>
+
+<%= if @game_state == :play_game do %>
+<section class="players">
+  <ul>
+    <%= for player <- Enum.sort(@session.players) do %>
+      <li class="<%= if current_player?(@session, player.id), do: :current %>">
+        <div class="player_name"><%= player.name %></div>
+        <%= for _ <- player.rack do %>
+          <div class="placeholder_tile"></div>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+  <p class="player_invitation">Share this link to invite other players: <span class="invite_uri"><%= @invite_uri %></span></p>
+</section>
+
+<div id="played_sets">
+<%= for {set, set_index} <- Enum.reverse(Enum.with_index(@session.sets)) do %>
+<div class="<%= css_classes_for_set(set) %>" id="set-<%= set_index %>" data-set-index="<%= set_index %>" phx-hook="SetHook">
+  <%= for tile <- sorted_set(set) do %>
+    <div id="tile-<%= tile.id %>" data-set-index="<%= set_index %>" data-tile-id="<%= tile.id %>" draggable="true" class="tile <%= tile.color %>" phx-hook="TileHook"><%= if tile.value == :joker, do: "🃏", else: tile.value %></div>
+  <% end %>
+</div>
+<% end %>
+<div class="set" id="new_set" data-set-index="new_set" phx-hook="SetHook">New Set</div>
+</div>
+
+<h2>Your Rack</h2>
+<div id="rack" data-set-index="rack" phx-hook="SetHook">
+  <%= for tile <- player_by_id(@session, @player_id).rack do %>
+    <div id="rack-tile-<%= tile.id %>" data-set-index="rack" data-tile-id="<%= tile.id %>" draggable="true" class="tile <%= tile.color %>" phx-hook="TileHook"><%= if tile.value == :joker, do: "🃏", else: tile.value %></div>
+  <% end %>
+</div>
+
+<div id="action_bar">
+<%= if @session.state == :round_start do %>
+  <button phx-click="pick-tile" <%= unless can_pick_tile?(@session, @player_id), do: "disabled" %>>Pick from Pool</button>
+<% else %>
+  <button phx-click="end-turn" <%= unless can_end_turn?(@session, @player_id), do: "disabled" %>>End Turn</button>
+<% end %>
+</div>
+<% end %>

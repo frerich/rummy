@@ -17,7 +17,8 @@ defmodule RummyWeb.Router do
   scope "/", RummyWeb do
     pipe_through :browser
 
-    live "/", PageLive, :index
+    live "/", MainLive, :index
+    live "/:game_id", MainLive, :index
   end
 
   # Other scopes may use custom stacks.
