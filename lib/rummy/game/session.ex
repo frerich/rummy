@@ -74,6 +74,8 @@ defmodule Rummy.Game.Session do
   end
 
   def end_turn(%{players: [current | next]} = session) do
+    played_initial_30? = current.played_initial_30? || played_set_worth_30_or_more(session)
+    current = %{current | played_initial_30?: played_initial_30?}
     {:ok, %{session | players: next ++ [current], tiles_played_in_round: []}}
   end
 
