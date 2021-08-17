@@ -27,8 +27,18 @@
     <%= for player <- Enum.sort(@session.players) do %>
       <li class="<%= if current_player?(@session, player.id), do: :current %>">
         <div class="player_name"><%= player.name %></div>
-        <%= for _ <- player.rack do %>
-          <div class="placeholder_tile"></div>
+        <%= if length(player.rack) <= 14 do %>
+          <%= for _ <- player.rack do %>
+            <div class="placeholder_tile"></div>
+          <% end %>
+        <% else %>
+          <%= for _ <- 0..6 do %>
+            <div class="placeholder_tile"></div>
+          <% end %>
+          &hellip;
+          <%= for _ <- 0..6 do %>
+            <div class="placeholder_tile"></div>
+          <% end %>
         <% end %>
       </li>
     <% end %>
