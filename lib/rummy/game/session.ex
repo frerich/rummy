@@ -86,12 +86,7 @@ defmodule Rummy.Game.Session do
   def can_end_turn?(%{players: [%{played_initial_30?: false} | _]} = session) do
     all_sets_valid = Enum.all?(session.sets, &Set.valid?/1)
 
-    played_set_worth_30_or_more =
-      session.sets
-      |> Enum.filter(fn set -> Enum.all?(set, &(&1.id in session.tiles_played_in_round)) end)
-      |> Enum.any?(&(Set.value(&1) >= 30))
-
-    all_sets_valid and played_set_worth_30_or_more
+    all_sets_valid and played_set_worth_30_or_more(session)
   end
 
   def create_set(%{sets: sets} = session, tile) do
@@ -124,5 +119,11 @@ defmodule Rummy.Game.Session do
       {[_], rest} -> {:ok, %{session | tiles_played_in_round: rest}}
       {[], _rest} -> {:error, :tile_not_played_in_round}
     end
+  end
+
+  defp played_set_worth_30_or_more(session) do
+    session.sets
+    |> Enum.filter(fn set -> Enum.all?(set, &(&1.id in session.tiles_played_in_round)) end)
+    |> Enum.any?(&(Set.value(&1) >= 30))
   end
 end
