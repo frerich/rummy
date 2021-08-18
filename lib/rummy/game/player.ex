@@ -11,6 +11,12 @@ defmodule Rummy.Game.Player do
     end
   end
 
+  def take_tile(%{rack: rack} = player, tile_id) do
+    with {:ok, {tile, rest}} <- Rummy.Game.Set.take_tile(rack, tile_id) do
+      {:ok, {tile, %{player | rack: rest}}}
+    end
+  end
+
   def add_tile(player, %Rummy.Game.Tile{} = tile) do
     Map.update!(player, :rack, &[tile | &1])
   end
