@@ -81,6 +81,13 @@ defmodule Rummy.Game.Set do
     end
   end
 
+  def take_tile(tiles, tile_id) do
+    case Enum.split_while(tiles, & &1.id != tile_id) do
+      {first_half, [tile | second_half]} -> {:ok, {tile, first_half ++ second_half}}
+      _ -> {:error, :no_such_tile}
+    end
+  end
+
   defp all_equal?([]), do: true
   defp all_equal?([x | xs]), do: Enum.all?(xs, &(&1 == x))
 
