@@ -30,16 +30,8 @@ defmodule Rummy.Server do
     GenServer.call(via_name(id), :pick_tile)
   end
 
-  def recall_tile(id, set_index, tile_index) do
-    GenServer.call(via_name(id), {:recall_tile, set_index, tile_index})
-  end
-
-  def create_set(id, set_index, tile_index) do
-    GenServer.call(via_name(id), {:create_set, set_index, tile_index})
-  end
-
-  def amend_set(id, dst_set_index, src_set_index, tile_index) do
-    GenServer.call(via_name(id), {:amend_set, dst_set_index, src_set_index, tile_index})
+  def move_tile(id, src_set, tile_id, dest_set) do
+    GenServer.call(via_name(id), {:move_tile, src_set, tile_id, dest_set})
   end
 
   def can_end_turn?(id) do
@@ -95,28 +87,14 @@ defmodule Rummy.Server do
   @impl true
   def handle_call(:pick_tile, _from, session) do
     session
-    |> Rummy.Game.Moves.pick_tile()
+    |> Rummy.Game.Session.pick_tile()
     |> call_reply(session)
   end
 
   @impl true
-  def handle_call({:recall_tile, set_index, tile_index}, _from, session) do
+  def handle_call({:move_tile, src_set, tile_id, dest_set}, _from, session) do
     session
-    |> Rummy.Game.Moves.recall_tile(set_index, tile_index)
-    |> call_reply(session)
-  end
-
-  @impl true
-  def handle_call({:create_set, set_index, tile_index}, _from, session) do
-    session
-    |> Rummy.Game.Moves.create_set(set_index, tile_index)
-    |> call_reply(session)
-  end
-
-  @impl true
-  def handle_call({:amend_set, dst_set_index, src_set_index, tile_index}, _from, session) do
-    session
-    |> Rummy.Game.Moves.amend_set(dst_set_index, src_set_index, tile_index)
+    |> Rummy.Game.Session.move_tile(src_set, tile_id, dest_set)
     |> call_reply(session)
   end
 
@@ -128,7 +106,7 @@ defmodule Rummy.Server do
   @impl true
   def handle_call(:end_turn, _from, session) do
     session
-    |> Rummy.Game.Moves.end_turn()
+    |> Rummy.Game.Session.end_turn()
     |> call_reply(session)
   end
 

@@ -41,19 +41,9 @@ defmodule Rummy do
     |> broadcast(id, {:session_updated, :tile_picked})
   end
 
-  def recall_tile(id, set_index, tile_index) do
-    Server.recall_tile(id, set_index, tile_index)
-    |> broadcast(id, {:session_updated, :tile_recalled})
-  end
-
-  def create_set(id, set_index, tile_index) do
-    Server.create_set(id, set_index, tile_index)
-    |> broadcast(id, {:session_updated, :set_created})
-  end
-
-  def amend_set(id, dst_set_index, src_set_index, tile_index) do
-    Server.amend_set(id, dst_set_index, src_set_index, tile_index)
-    |> broadcast(id, {:session_updated, :set_amended})
+  def move_tile(id, src_set, tile_id, dest_set) do
+    Server.move_tile(id, src_set, tile_id, dest_set)
+    |> broadcast(id, {:session_updated, :tile_picked})
   end
 
   def can_end_turn?(id) do

@@ -23,7 +23,8 @@ const hooks = {
     pushTileMovedEvent(tileElem, dstSetElem) {
         let message = {
             tileId: tileElem.dataset.tileId,
-            dst: dstSetElem.dataset.setIndex,
+            srcSet: tileElem.parentElement.dataset.setIndex,
+            destSet: dstSetElem.dataset.setIndex,
         };
         this.pushEvent('tile-moved', message);
     },

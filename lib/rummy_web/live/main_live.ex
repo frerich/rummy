@@ -36,25 +36,13 @@ defmodule RummyWeb.MainLive do
 
   @impl true
   def handle_event("tile-moved", params, socket) do
-    case params do
-      %{"dst" => "new_set", "tileId" => tile_id} ->
-        {set_index, tile_index} = tile_id_to_indices(socket.assigns.session, String.to_integer(tile_id))
-        Rummy.create_set(socket.assigns.game_id, set_index, tile_index)
+    %{
+      "destSet" => dest_set,
+      "srcSet" => src_set,
+      "tileId" => tile_id
+    } = params
 
-      %{"dst" => "rack", "tileId" => tile_id} ->
-        case tile_id_to_indices(socket.assigns.session, String.to_integer(tile_id)) do
-          {:rack, _tile_index} ->
-            # We just ignore attempts to move a tile from the rack, to the rack.
-            socket.assigns.session
-
-          {set_index, tile_index} ->
-            Rummy.recall_tile(socket.assigns.game_id, set_index, tile_index)
-        end
-
-      %{"dst" => dst_set_index, "tileId" => tile_id} ->
-        {set_index, tile_index} = tile_id_to_indices(socket.assigns.session, String.to_integer(tile_id))
-        Rummy.amend_set(socket.assigns.game_id, String.to_integer(dst_set_index), set_index, tile_index)
-    end
+    Rummy.move_tile(socket.assigns.game_id, parse_set_id(src_set), String.to_integer(tile_id), parse_set_id(dest_set))
 
     {:noreply, socket}
   end
@@ -146,17 +134,7 @@ defmodule RummyWeb.MainLive do
     current_player?(session, player_id) and Rummy.Game.Session.can_end_turn?(session)
   end
 
-  defp tile_id_to_indices(session, tile_id) do
-    {:ok, current_player} = Rummy.Game.Session.current_player(session)
-
-    sets = [{current_player.rack, :rack} | Enum.with_index(session.sets)]
-
-    Enum.find_value(sets, fn {set, set_index} ->
-      set
-      |> Enum.with_index()
-      |> Enum.find_value(fn {tile, tile_index} ->
-        if tile.id == tile_id, do: {set_index, tile_index}
-      end)
-    end)
-  end
+  defp parse_set_id("new_set"), do: :new_set
+  defp parse_set_id("rack"), do: :rack
+  defp parse_set_id(index), do: String.to_integer(index)
 end

@@ -5,12 +5,6 @@ defmodule Rummy.Game.Player do
     %__MODULE__{id: id, name: name, rack: rack, played_initial_30?: false}
   end
 
-  def take_tile_at(%{rack: rack} = player, index) do
-    with {:ok, {tile, rest}} <- Rummy.Game.Set.take_tile_at(rack, index) do
-      {:ok, {tile, %{player | rack: rest}}}
-    end
-  end
-
   def take_tile(%{rack: rack} = player, tile_id) do
     with {:ok, {tile, rest}} <- Rummy.Game.Set.take_tile(rack, tile_id) do
       {:ok, {tile, %{player | rack: rest}}}

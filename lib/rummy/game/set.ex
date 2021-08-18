@@ -71,21 +71,15 @@ defmodule Rummy.Game.Set do
     end
   end
 
-  def take_tile_at(_tiles, index) when not is_integer(index) or index < 0,
-    do: {:error, :invalid_index}
-
-  def take_tile_at(tiles, index) do
-    case List.pop_at(tiles, index) do
-      {nil, _} -> {:error, :not_enough_tiles}
-      {tile, rest} -> {:ok, {tile, rest}}
-    end
-  end
-
   def take_tile(tiles, tile_id) do
     case Enum.split_while(tiles, & &1.id != tile_id) do
       {first_half, [tile | second_half]} -> {:ok, {tile, first_half ++ second_half}}
       _ -> {:error, :no_such_tile}
     end
+  end
+
+  def add_tile(tiles, tile) do
+    [tile | tiles]
   end
 
   defp all_equal?([]), do: true
