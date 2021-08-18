@@ -5,13 +5,9 @@ defmodule Rummy.Game.Player do
     %__MODULE__{id: id, name: name, rack: rack, played_initial_30?: false}
   end
 
-  def take_tile_at(_player, index) when not is_integer(index) or index < 0,
-    do: {:error, :invalid_index}
-
   def take_tile_at(%{rack: rack} = player, index) do
-    case List.pop_at(rack, index) do
-      {nil, _} -> {:error, :not_enough_tiles}
-      {tile, rest} -> {:ok, {tile, %{player | rack: rest}}}
+    with {:ok, {tile, rest}} <- Rummy.Game.Set.take_tile_at(rack, index) do
+      {:ok, {tile, %{player | rack: rest}}}
     end
   end
 
