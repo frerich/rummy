@@ -93,8 +93,8 @@
     display: flex;
     flex-wrap: nowrap;
     border-radius: 5px;
-    margin-right: 1em;
-    margin-bottom: 1em;
+    margin-right: 8px;
+    margin-bottom: 8px;
 }
 
 @keyframes invalid_set_highlight {
@@ -149,7 +149,7 @@
     border-radius: 5px;
     text-align: center;
     font-size: 2em;
-    cursor: move;
+    cursor: pointer;
     background-color: #f0ead6;
 }
 
