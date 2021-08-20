@@ -1,7 +1,12 @@
 defmodule Rummy.Game.Session do
   alias Rummy.Game.{Player, Set}
 
-  defstruct id: nil, players: [], pool: [], sets: [], state: :round_start, tiles_played_in_round: []
+  defstruct id: nil,
+            players: [],
+            pool: [],
+            sets: [],
+            state: :round_start,
+            tiles_played_in_round: []
 
   @initial_number_of_tiles 14
 
