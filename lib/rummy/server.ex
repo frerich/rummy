@@ -2,13 +2,14 @@ defmodule Rummy.Server do
   use GenServer, restart: :transient
 
   alias Rummy.Game.Session
+  alias Phoenix.PubSub
 
   def start() do
     id = generate_server_id()
 
     case DynamicSupervisor.start_child(
            Rummy.Server.Supervisor,
-           {Rummy.Server, server_id: id, name: via_name(id)}
+           {__MODULE__, server_id: id, name: via_name(id)}
          ) do
       {:ok, _pid} ->
         {:ok, id}
@@ -19,7 +20,14 @@ defmodule Rummy.Server do
   end
 
   def add_player(id, player_name) do
-    GenServer.call(via_name(id), {:add_player, player_name})
+    result = GenServer.call(via_name(id), {:add_player, player_name})
+
+    with {:ok, player} <- result do
+      PubSub.subscribe(Rummy.PubSub, topic(id))
+      Rummy.ProcessMonitor.watch(self(), fn _reason -> remove_player(id, player.id) end)
+    end
+
+    result
   end
 
   def remove_player(id, player_id) do
@@ -63,7 +71,10 @@ defmodule Rummy.Server do
 
   @impl true
   def handle_call({:add_player, player_name}, _from, session) do
-    case Session.add_player(session, player_name) do
+    session
+    |> Session.add_player(player_name)
+    |> broadcast(session.id, {:session_updated, :player_joined})
+    |> case do
       {:ok, {player, session}} -> {:reply, {:ok, player}, session}
       {:error, _reason} = err -> {:reply, err, session}
     end
@@ -71,7 +82,10 @@ defmodule Rummy.Server do
 
   @impl true
   def handle_call({:remove_player, player_id}, _from, session) do
-    case Session.remove_player(session, player_id) do
+    session
+    |> Session.remove_player(player_id)
+    |> broadcast(session.id, {:session_updated, :player_left})
+    |> case do
       {:ok, session} ->
         case session.players do
           [] ->
@@ -90,6 +104,7 @@ defmodule Rummy.Server do
   def handle_call(:pick_tile, _from, session) do
     session
     |> Rummy.Game.Session.pick_tile()
+    |> broadcast(session.id, {:session_updated, :tile_picked})
     |> call_reply(session)
   end
 
@@ -97,6 +112,7 @@ defmodule Rummy.Server do
   def handle_call({:move_tile, src_set, tile_id, dest_set}, _from, session) do
     session
     |> Rummy.Game.Session.move_tile(src_set, tile_id, dest_set)
+    |> broadcast(session.id, {:session_updated, :tile_moved})
     |> call_reply(session)
   end
 
@@ -109,6 +125,7 @@ defmodule Rummy.Server do
   def handle_call(:end_turn, _from, session) do
     session
     |> Rummy.Game.Session.end_turn()
+    |> broadcast(session.id, {:session_updated, :turn_ended})
     |> call_reply(session)
   end
 
@@ -127,4 +144,13 @@ defmodule Rummy.Server do
 
   defp call_reply({:error, _} = result, state), do: {:reply, result, state}
   defp call_reply({:ok, %Session{} = session} = result, _state), do: {:reply, result, session}
+
+  defp broadcast({:error, _} = result, _id, _msg), do: result
+
+  defp broadcast({:ok, _} = result, id, msg) do
+    PubSub.broadcast(Rummy.PubSub, topic(id), msg)
+    result
+  end
+
+  defp topic(game_id), do: "game:#{game_id}"
 end

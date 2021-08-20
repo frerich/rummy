@@ -1,6 +1,8 @@
 defmodule RummyWeb.MainLive do
   use RummyWeb, :live_view
 
+  alias Rummy.Server
+
   @impl true
   def mount(params, _session, socket) do
     socket =
@@ -15,7 +17,7 @@ defmodule RummyWeb.MainLive do
 
   @impl true
   def handle_event("start", %{"name" => name}, socket) do
-    {:ok, game_id} = Rummy.start_game()
+    {:ok, game_id} = Server.start()
 
     socket =
       socket
@@ -42,20 +44,20 @@ defmodule RummyWeb.MainLive do
       "tileId" => tile_id
     } = params
 
-    Rummy.move_tile(socket.assigns.game_id, parse_set_id(src_set), String.to_integer(tile_id), parse_set_id(dest_set))
+    Server.move_tile(socket.assigns.game_id, parse_set_id(src_set), String.to_integer(tile_id), parse_set_id(dest_set))
 
     {:noreply, socket}
   end
 
   @impl true
   def handle_event("pick-tile", _params, socket) do
-    Rummy.pick_tile(socket.assigns.game_id)
+    Server.pick_tile(socket.assigns.game_id)
     {:noreply, socket}
   end
 
   @impl true
   def handle_event("end-turn", _params, socket) do
-    Rummy.end_turn(socket.assigns.game_id)
+    Server.end_turn(socket.assigns.game_id)
     {:noreply, socket}
   end
 
@@ -67,16 +69,16 @@ defmodule RummyWeb.MainLive do
 
   @impl true
   def handle_info({:session_updated, _what}, socket) do
-    {:noreply, assign(socket, session: Rummy.get_session(socket.assigns.game_id))}
+    {:noreply, assign(socket, session: Server.get_session(socket.assigns.game_id))}
   end
 
   defp enter_game(socket, game_id, player_name) do
-    {:ok, player} = Rummy.join_game(game_id, player_name)
+    {:ok, player} = Server.add_player(game_id, player_name)
 
     socket
     |> assign(game_id: game_id)
     |> assign(player_id: player.id)
-    |> assign(session: Rummy.get_session(game_id))
+    |> assign(session: Server.get_session(game_id))
     |> assign_game_state()
   end
 
@@ -93,7 +95,7 @@ defmodule RummyWeb.MainLive do
         assign(socket, game_state: game_state)
 
       _ ->
-        if Rummy.game_running?(socket.assigns.game_id) do
+        if Server.active?(socket.assigns.game_id) do
           assign(socket, game_state: game_state)
         else
           socket
