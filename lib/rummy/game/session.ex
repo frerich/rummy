@@ -1,12 +1,13 @@
 defmodule Rummy.Game.Session do
   alias Rummy.Game.{Player, Set}
 
-  defstruct players: [], pool: [], sets: [], state: :round_start, tiles_played_in_round: []
+  defstruct id: nil, players: [], pool: [], sets: [], state: :round_start, tiles_played_in_round: []
 
   @initial_number_of_tiles 14
 
-  def new() do
+  def new(id) do
     %__MODULE__{
+      id: id,
       pool: Enum.shuffle(Rummy.Game.Tile.pool())
     }
   end

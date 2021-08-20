@@ -8,7 +8,7 @@ defmodule Rummy.Server do
 
     case DynamicSupervisor.start_child(
            Rummy.Server.Supervisor,
-           {Rummy.Server, name: via_name(id)}
+           {Rummy.Server, server_id: id, name: via_name(id)}
          ) do
       {:ok, _pid} ->
         {:ok, id}
@@ -51,7 +51,9 @@ defmodule Rummy.Server do
   end
 
   def start_link(options) do
-    GenServer.start_link(__MODULE__, Session.new(), options)
+    server_id = Keyword.get(options, :server_id)
+
+    GenServer.start_link(__MODULE__, Session.new(server_id), options)
   end
 
   @impl true
