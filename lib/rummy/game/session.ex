@@ -51,8 +51,14 @@ defmodule Rummy.Game.Session do
   def pick_tile(%{pool: []}),
     do: {:error, :not_enough_tiles}
 
-  def pick_tile(%{pool: [tile | pool]} = session),
-    do: put_tile(%{session | pool: pool}, tile, :rack)
+  def pick_tile(%{players: []}),
+    do: {:error, :not_enough_players}
+
+  def pick_tile(%{players: [current | next], pool: [tile | pool]} = session) do
+    with {:ok, session} <- put_tile(session, tile, :rack) do
+      {:ok, %{session | players: next ++ [current], pool: pool}}
+    end
+  end
 
   def end_turn(%{players: [current | next]} = session) do
     played_initial_30? = current.played_initial_30? || played_set_worth_30_or_more(session)
