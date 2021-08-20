@@ -1,10 +1,18 @@
 # Rummy
 
-To launch the application on port 5000:
+## Live Instance
+
+Go to https://rummy.gigalixirapp.com
+
+## Local Instance
+
+To launch the application locally on port 5000:
 
 ```sh
 $ docker compose run --rm app
 ```
+
+## Development
 
 During development, it might be more convenient to use
 
