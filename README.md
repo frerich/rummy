@@ -9,7 +9,7 @@ Go to https://rummy.gigalixirapp.com
 To launch the application locally on port 5000:
 
 ```sh
-$ docker compose run --rm app
+$ docker compose run --service-ports --rm app
 ```
 
 ## Development
@@ -17,7 +17,7 @@ $ docker compose run --rm app
 During development, it might be more convenient to use
 
 ```sh
-$ docker compose run --rm app iex -S mix phx.server
+$ docker compose run --service-ports --rm app iex -S mix phx.server
 ```
 
 ...since that will also give you an interactive console which lets you interact
