@@ -103,7 +103,7 @@ defmodule Rummy.Server do
   @impl true
   def handle_call(:pick_tile, _from, session) do
     session
-    |> Rummy.Game.Session.pick_tile()
+    |> Session.pick_tile()
     |> broadcast(session.id, {:session_updated, :tile_picked})
     |> call_reply(session)
   end
@@ -111,7 +111,7 @@ defmodule Rummy.Server do
   @impl true
   def handle_call({:move_tile, src_set, tile_id, dest_set}, _from, session) do
     session
-    |> Rummy.Game.Session.move_tile(src_set, tile_id, dest_set)
+    |> Session.move_tile(src_set, tile_id, dest_set)
     |> broadcast(session.id, {:session_updated, :tile_moved})
     |> call_reply(session)
   end
@@ -124,7 +124,7 @@ defmodule Rummy.Server do
   @impl true
   def handle_call(:end_turn, _from, session) do
     session
-    |> Rummy.Game.Session.end_turn()
+    |> Session.end_turn()
     |> broadcast(session.id, {:session_updated, :turn_ended})
     |> call_reply(session)
   end
