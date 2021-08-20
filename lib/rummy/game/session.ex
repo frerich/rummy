@@ -88,12 +88,6 @@ defmodule Rummy.Game.Session do
   def current_player(%{players: []}), do: {:error, :not_enough_players}
   def current_player(%{players: [p | _]}), do: {:ok, p}
 
-  defp played_set_worth_30_or_more(session) do
-    session.sets
-    |> Enum.filter(fn set -> Enum.all?(set, &(&1.id in session.tiles_played_in_round)) end)
-    |> Enum.any?(&(Set.value(&1) >= 30))
-  end
-
   def move_tile(session, src_set, _tile_id, dest_set) when src_set == dest_set do
     {:ok, session}
   end
@@ -167,4 +161,12 @@ defmodule Rummy.Game.Session do
 
   defp purge_empty_sets(session),
     do: %{session | sets: Enum.reject(session.sets, &(&1 == []))}
+
+  defp played_set_worth_30_or_more(session) do
+    newly_played_sets =
+      session.sets
+      |> Enum.filter(fn set -> Enum.all?(set, &(&1.id in session.tiles_played_in_round)) end)
+
+    Enum.any?(newly_played_sets, &(Set.value(&1) >= 30))
+  end
 end
