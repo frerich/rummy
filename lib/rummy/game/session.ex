@@ -27,10 +27,7 @@ defmodule Rummy.Game.Session do
     player_id = Enum.random(1..1_0000_000)
     player = Player.new(player_id, player_name, rack)
 
-    session =
-      session
-      |> Map.put(:pool, pool)
-      |> Map.update!(:players, &(&1 ++ [player]))
+    session = %{session | pool: pool, players: session.players ++ [player]}
 
     {:ok, {player, session}}
   end
@@ -38,10 +35,7 @@ defmodule Rummy.Game.Session do
   def remove_player(session, player_id) do
     case Enum.split_with(session.players, &(&1.id == player_id)) do
       {[player], others} ->
-        session =
-          session
-          |> Map.update!(:pool, &(player.rack ++ &1))
-          |> Map.put(:players, others)
+        session = %{session | players: others, pool: player.rack ++ session.pool}
 
         {:ok, session}
 
