@@ -125,38 +125,38 @@ defmodule Rummy.Game.Session do
     end
   end
 
-  def take_tile(%{players: []}, _tile_id, :rack),
+  defp take_tile(%{players: []}, _tile_id, :rack),
     do: {:error, :not_enough_players}
 
-  def take_tile(%{players: [current | players]} = session, tile_id, :rack) do
+  defp take_tile(%{players: [current | players]} = session, tile_id, :rack) do
     with {:ok, {tile, player}} <- Player.take_tile(current, tile_id) do
       {:ok, {tile, %{session | players: [player | players]}}}
     end
   end
 
-  def take_tile(%{sets: sets}, _tile_id, set_index) when set_index not in 0..(length(sets) - 1),
+  defp take_tile(%{sets: sets}, _tile_id, set_index) when set_index not in 0..(length(sets) - 1),
     do: {:error, :invalid_index}
 
-  def take_tile(%{sets: sets} = session, tile_id, set_index) when is_integer(set_index) do
+  defp take_tile(%{sets: sets} = session, tile_id, set_index) when is_integer(set_index) do
     with {:ok, {tile, new_set}} <- Set.take_tile(Enum.at(sets, set_index), tile_id) do
       session = %{session | sets: List.update_at(sets, set_index, fn _ -> new_set end)}
       {:ok, {tile, session}}
     end
   end
 
-  def put_tile(%{sets: sets} = session, tile, :new_set),
+  defp put_tile(%{sets: sets} = session, tile, :new_set),
     do: {:ok, %{session | sets: [[tile] | sets]}}
 
-  def put_tile(%{players: []}, _tile, :rack),
+  defp put_tile(%{players: []}, _tile, :rack),
     do: {:error, :not_enough_players}
 
-  def put_tile(%{players: players} = session, tile, :rack),
+  defp put_tile(%{players: players} = session, tile, :rack),
     do: {:ok, %{session | players: List.update_at(players, 0, &Player.add_tile(&1, tile))}}
 
-  def put_tile(%{sets: sets}, _tile, index) when index not in 0..(length(sets) - 1),
+  defp put_tile(%{sets: sets}, _tile, index) when index not in 0..(length(sets) - 1),
     do: {:error, :invalid_index}
 
-  def put_tile(%{sets: sets} = session, tile, index),
+  defp put_tile(%{sets: sets} = session, tile, index),
     do: {:ok, %{session | sets: List.update_at(sets, index, &Set.add_tile(&1, tile))}}
 
   defp purge_empty_sets(session),
