@@ -29,11 +29,7 @@ defmodule RummyWeb.MainLive do
 
   @impl true
   def handle_event("join", %{"name" => name}, socket) do
-    socket =
-      socket
-      |> enter_game(socket.assigns.game_id, name)
-
-    {:noreply, socket}
+    {:noreply, enter_game(socket, socket.assigns.game_id, name)}
   end
 
   @impl true
