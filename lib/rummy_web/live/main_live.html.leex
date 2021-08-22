@@ -33,12 +33,12 @@
             <div data-tile-id="<%= tile.id %>" class="placeholder_tile"></div>
           <% end %>
         <% else %>
-          <%= for _ <- 0..6 do %>
-            <div class="placeholder_tile"></div>
+          <%= for tile <- Enum.take(player.rack, 7) do %>
+            <div data-tile-id="<%= tile.id %>" class="placeholder_tile"></div>
           <% end %>
           &hellip;
-          <%= for _ <- 0..6 do %>
-            <div class="placeholder_tile"></div>
+          <%= for tile <- Enum.take(player.rack, -7) do %>
+            <div data-tile-id="<%= tile.id %>" class="placeholder_tile"></div>
           <% end %>
         <% end %>
       </li>
