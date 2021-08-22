@@ -29,8 +29,16 @@ const TileAnimation = {
     restoreTilePositions: (previousPositions) => {
         let currentPositions = TileAnimation.rememberTilePositions();
         for (var tileId in currentPositions) {
-            let prevPos = previousPositions[tileId].pos;
             let currPos = currentPositions[tileId].pos;
+
+            let prevPos;
+            if (tileId in previousPositions) {
+                prevPos = previousPositions[tileId].pos;
+            } else {
+                // Newly added tiles seem to show up at the left window border
+                prevPos = {x: 0, y: 100, width: 1, height: 1};
+            }
+
             if (prevPos == currPos) {
                 continue;
             }
