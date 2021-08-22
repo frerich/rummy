@@ -11,7 +11,7 @@ defmodule Rummy.Game.Player do
     end
   end
 
-  def add_tile(player, %Rummy.Game.Tile{} = tile) do
-    Map.update!(player, :rack, &[tile | &1])
+  def add_tile(%{rack: rack} = player, %Rummy.Game.Tile{} = tile) do
+    %{player | rack: Rummy.Game.Set.add_tile(rack, tile)}
   end
 end
