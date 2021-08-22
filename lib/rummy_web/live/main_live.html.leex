@@ -22,14 +22,15 @@
 <% end %>
 
 <%= if @game_state == :play_game do %>
+<div id="tileContainer" phx-hook="TileContainer">
 <section class="players">
   <ul>
     <%= for player <- Enum.sort(@session.players) do %>
       <li class="<%= if current_player?(@session, player.id), do: :current %>">
         <div class="player_name"><%= player.name %></div>
         <%= if length(player.rack) <= 14 do %>
-          <%= for _ <- player.rack do %>
-            <div class="placeholder_tile"></div>
+          <%= for tile <- player.rack do %>
+            <div data-tile-id="<%= tile.id %>" class="placeholder_tile"></div>
           <% end %>
         <% else %>
           <%= for _ <- 0..6 do %>
@@ -72,3 +73,4 @@
 <% end %>
 </div>
 <% end %>
+</div>

@@ -17,7 +17,53 @@ import {Socket} from "phoenix"
 import topbar from "topbar"
 import {LiveSocket} from "phoenix_live_view"
 
+const TileAnimation = {
+    rememberTilePositions: () => {
+        let tiles = Array.from(document.querySelectorAll("[data-tile-id]"));
+        return tiles.reduce((map, tile) => {
+            map[tile.dataset.tileId] = {tile: tile, pos: tile.getBoundingClientRect()};
+            return map;
+        }, {});
+    },
+
+    restoreTilePositions: (previousPositions) => {
+        let currentPositions = TileAnimation.rememberTilePositions();
+        for (var tileId in currentPositions) {
+            let prevPos = previousPositions[tileId].pos;
+            let currPos = currentPositions[tileId].pos;
+            if (prevPos == currPos) {
+                continue;
+            }
+
+            let dx = prevPos.x - currPos.x;
+            let dy = prevPos.y - currPos.y;
+            let sx = prevPos.width / currPos.width;
+            let sy = prevPos.height / currPos.height;
+
+            currentPositions[tileId].tile.animate([{
+              transformOrigin: 'top left',
+              transform: `
+                translate(${dx}px, ${dy}px)
+                scale(${sx}, ${sy})
+              `
+            }, {
+              transformOrigin: 'top left',
+              transform: 'none'
+            }], {
+              duration: 300,
+              easing: 'ease-in-out',
+              fill: 'backwards'
+            });
+        }
+    }
+}
+
 const hooks = {
+    TileContainer: {
+        beforeUpdate() { this.positions = TileAnimation.rememberTilePositions(); },
+        updated() { TileAnimation.restoreTilePositions(this.positions); }
+    },
+
     SetHook: {
 
     pushTileMovedEvent(tileElem, dstSetElem) {
