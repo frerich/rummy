@@ -2,11 +2,11 @@
 <header class="intro">
   <p>Welcome</p>
   <p>to</p>
-  <p><img src="<%= Routes.static_path(@socket, "/images/rummy.jpg") %>"></p>
+  <p><img src={Routes.static_path(@socket, "/images/rummy.jpg")}></p>
 </header>
 <% else %>
 <header>
-  <img src="<%= Routes.static_path(@socket, "/images/rummy.jpg") %>">
+  <img src={Routes.static_path(@socket, "/images/rummy.jpg")}>
 </header>
 <% end %>
 
