@@ -40,7 +40,12 @@ defmodule RummyWeb.MainLive do
       "tileId" => tile_id
     } = params
 
-    Server.move_tile(socket.assigns.game_id, parse_set_id(src_set), String.to_integer(tile_id), parse_set_id(dest_set))
+    Server.move_tile(
+      socket.assigns.game_id,
+      parse_set_id(src_set),
+      String.to_integer(tile_id),
+      parse_set_id(dest_set)
+    )
 
     {:noreply, socket}
   end

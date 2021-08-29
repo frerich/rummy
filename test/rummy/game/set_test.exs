@@ -89,31 +89,38 @@ defmodule Rummy.SetTest do
     end
 
     test "sort by color first, then value" do
-      assert Set.sort(tiles(red: 11, black: 7, blue: 8, blue: 4, red: 12)) == tiles(black: 7, blue: 4, blue: 8, red: 11, red: 12)
+      assert Set.sort(tiles(red: 11, black: 7, blue: 8, blue: 4, red: 12)) ==
+               tiles(black: 7, blue: 4, blue: 8, red: 11, red: 12)
     end
 
     test "a joker can be used to fill a gap in the middle" do
-      assert Set.sort(tiles(black: :joker, red: 10, red: 8)) == tiles(red: 8, black: :joker, red: 10)
+      assert Set.sort(tiles(black: :joker, red: 10, red: 8)) ==
+               tiles(red: 8, black: :joker, red: 10)
     end
 
     test "a joker defaults to fill in at the top" do
-      assert Set.sort(tiles(orange: 6, orange: 5, black: :joker)) == tiles(orange: 5, orange: 6, black: :joker)
+      assert Set.sort(tiles(orange: 6, orange: 5, black: :joker)) ==
+               tiles(orange: 5, orange: 6, black: :joker)
     end
 
     test "a joker fills at the bottom if the top is full" do
-      assert Set.sort(tiles(orange: 12, orange: 13, black: :joker)) == tiles(black: :joker, orange: 12, orange: 13)
+      assert Set.sort(tiles(orange: 12, orange: 13, black: :joker)) ==
+               tiles(black: :joker, orange: 12, orange: 13)
     end
 
     test "two jokers filling at the top" do
-      assert Set.sort(tiles(blue: 10, orange: :joker, blue: 11, black: :joker)) == tiles(blue: 10, blue: 11, black: :joker, orange: :joker)
+      assert Set.sort(tiles(blue: 10, orange: :joker, blue: 11, black: :joker)) ==
+               tiles(blue: 10, blue: 11, black: :joker, orange: :joker)
     end
 
     test "two jokers, first one at the top, second at the bottom" do
-      assert Set.sort(tiles(blue: 11, orange: :joker, blue: 12, black: :joker)) == tiles(orange: :joker, blue: 11, blue: 12, black: :joker)
+      assert Set.sort(tiles(blue: 11, orange: :joker, blue: 12, black: :joker)) ==
+               tiles(orange: :joker, blue: 11, blue: 12, black: :joker)
     end
 
     test "two jokers, both at the bottom" do
-      assert Set.sort(tiles(red: 12, orange: :joker, red: 13, black: :joker)) == tiles(black: :joker, orange: :joker, red: 12, red: 13)
+      assert Set.sort(tiles(red: 12, orange: :joker, red: 13, black: :joker)) ==
+               tiles(black: :joker, orange: :joker, red: 12, red: 13)
     end
   end
 
@@ -143,7 +150,8 @@ defmodule Rummy.SetTest do
     end
 
     test "value of a run with two jokers (one at top)" do
-      assert Set.value(tiles(orange: 11, black: :joker, orange: 12, blue: :joker)) == 10 + 11 + 12 + 13
+      assert Set.value(tiles(orange: 11, black: :joker, orange: 12, blue: :joker)) ==
+               10 + 11 + 12 + 13
     end
   end
 

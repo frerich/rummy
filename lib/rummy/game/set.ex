@@ -29,10 +29,10 @@ defmodule Rummy.Game.Set do
           |> Enum.find(fn {tile, _index} -> tile.value != :joker end)
 
         first_value = numbered_tile.value - index
-        Enum.sum(first_value..first_value + Enum.count(tiles) - 1)
+        Enum.sum(first_value..(first_value + Enum.count(tiles) - 1))
 
       group?(tiles) ->
-        numbered_tile = Enum.find(tiles, & &1.value != :joker)
+        numbered_tile = Enum.find(tiles, &(&1.value != :joker))
         numbered_tile.value * Enum.count(tiles)
 
       true ->
@@ -58,21 +58,24 @@ defmodule Rummy.Game.Set do
           end)
 
         # Next, try to use remaining jokers at the top (highest value)
-        {jokers_for_top, jokers_remaining} = Enum.split(jokers_remaining, 13 - highest_valued.value)
+        {jokers_for_top, jokers_remaining} =
+          Enum.split(jokers_remaining, 13 - highest_valued.value)
+
         tiles_without_gaps = tiles_without_gaps ++ jokers_for_top
 
         # Use remaininig jokers at the bottom
         jokers_remaining ++ tiles_without_gaps
 
       group?(tiles) ->
-        Enum.sort_by(tiles, & [&1.color, &1.value])
+        Enum.sort_by(tiles, &[&1.color, &1.value])
+
       true ->
-        Enum.sort_by(tiles, & [&1.color, &1.value])
+        Enum.sort_by(tiles, &[&1.color, &1.value])
     end
   end
 
   def take_tile(tiles, tile_id) do
-    case Enum.split_while(tiles, & &1.id != tile_id) do
+    case Enum.split_while(tiles, &(&1.id != tile_id)) do
       {first_half, [tile | second_half]} -> {:ok, {tile, first_half ++ second_half}}
       _ -> {:error, :no_such_tile}
     end
