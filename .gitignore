@@ -25,7 +25,5 @@ rummy-*.tar
 # If NPM crashes, it generates a log, let's ignore it too.
 npm-debug.log
 
-# Since we are building assets from assets/,
-# we ignore priv/static. You may want to comment
-# this depending on your deployment strategy.
-/priv/static/
+# Since we are building assets from assets/, we ignore priv/static/assets/
+/priv/static/assets/
