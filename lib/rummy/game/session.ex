@@ -6,7 +6,8 @@ defmodule Rummy.Game.Session do
             pool: [],
             sets: [],
             state: :round_start,
-            tiles_played_in_round: []
+            tiles_played_in_round: [],
+            round_time: 0
 
   @initial_number_of_tiles 14
 
@@ -123,6 +124,16 @@ defmodule Rummy.Game.Session do
         {:ok, purge_empty_sets(session)}
       end
     end
+  end
+
+  def reset_round_time(session) do
+    %{session | round_time: 0}
+  end
+
+  def update_round_time(%{players: []}, _increment), do: {:error, :not_enough_players}
+
+  def update_round_time(%{round_time: round_time} = session, increment) do
+    {:ok, %{session | round_time: round_time + increment}}
   end
 
   defp take_tile(%{players: []}, _tile_id, :rack),
