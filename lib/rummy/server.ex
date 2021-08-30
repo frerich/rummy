@@ -66,72 +66,78 @@ defmodule Rummy.Server do
 
   @impl true
   def init(session) do
-    {:ok, session}
+    state = %{
+      session: session
+    }
+
+    {:ok, state}
   end
 
   @impl true
-  def handle_call({:add_player, player_name}, _from, session) do
-    session
+  def handle_call({:add_player, player_name}, _from, state) do
+    state.session
     |> Session.add_player(player_name)
-    |> broadcast(session.id, {:session_updated, :player_joined})
+    |> broadcast(state.session.id, {:session_updated, :player_joined})
     |> case do
-      {:ok, {player, session}} -> {:reply, {:ok, player}, session}
-      {:error, _reason} = err -> {:reply, err, session}
+      {:ok, {player, session}} -> {:reply, {:ok, player}, %{state | session: session}}
+      {:error, _reason} = err -> {:reply, err, state}
     end
   end
 
   @impl true
-  def handle_call({:remove_player, player_id}, _from, session) do
-    session
+  def handle_call({:remove_player, player_id}, _from, state) do
+    state.session
     |> Session.remove_player(player_id)
-    |> broadcast(session.id, {:session_updated, :player_left})
+    |> broadcast(state.session.id, {:session_updated, :player_left})
     |> case do
       {:ok, session} ->
+        state = %{state | session: session}
+
         case session.players do
           [] ->
-            {:stop, :normal, {:ok, session}, session}
+            {:stop, :normal, {:ok, session}, state}
 
           _ ->
-            {:reply, {:ok, session}, session}
+            {:reply, {:ok, session}, state}
         end
 
       {:error, _reason} = err ->
-        {:reply, err, session}
+        {:reply, err, state}
     end
   end
 
   @impl true
-  def handle_call(:pick_tile, _from, session) do
-    session
+  def handle_call(:pick_tile, _from, state) do
+    state.session
     |> Session.pick_tile()
-    |> broadcast(session.id, {:session_updated, :tile_picked})
-    |> call_reply(session)
+    |> broadcast(state.session.id, {:session_updated, :tile_picked})
+    |> call_reply(state)
   end
 
   @impl true
-  def handle_call({:move_tile, src_set, tile_id, dest_set}, _from, session) do
-    session
+  def handle_call({:move_tile, src_set, tile_id, dest_set}, _from, state) do
+    state.session
     |> Session.move_tile(src_set, tile_id, dest_set)
-    |> broadcast(session.id, {:session_updated, :tile_moved})
-    |> call_reply(session)
+    |> broadcast(state.session.id, {:session_updated, :tile_moved})
+    |> call_reply(state)
   end
 
   @impl true
-  def handle_call(:can_end_turn, _from, session) do
-    {:reply, Session.can_end_turn?(session), session}
+  def handle_call(:can_end_turn, _from, state) do
+    {:reply, Session.can_end_turn?(state.session), state}
   end
 
   @impl true
-  def handle_call(:end_turn, _from, session) do
-    session
+  def handle_call(:end_turn, _from, state) do
+    state.session
     |> Session.end_turn()
-    |> broadcast(session.id, {:session_updated, :turn_ended})
-    |> call_reply(session)
+    |> broadcast(state.session.id, {:session_updated, :turn_ended})
+    |> call_reply(state)
   end
 
   @impl true
-  def handle_call(:get_session, _from, session) do
-    {:reply, session, session}
+  def handle_call(:get_session, _from, state) do
+    {:reply, state.session, state}
   end
 
   defp via_name(id) do
@@ -143,7 +149,9 @@ defmodule Rummy.Server do
   end
 
   defp call_reply({:error, _} = result, state), do: {:reply, result, state}
-  defp call_reply({:ok, %Session{} = session} = result, _state), do: {:reply, result, session}
+
+  defp call_reply({:ok, %Session{} = session} = result, state),
+    do: {:reply, result, %{state | session: session}}
 
   defp broadcast({:error, _} = result, _id, _msg), do: result
 
