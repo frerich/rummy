@@ -67,10 +67,23 @@ defmodule Rummy.Server do
   @impl true
   def init(session) do
     state = %{
-      session: session
+      session: session,
+      round_timer: nil
     }
 
     {:ok, state}
+  end
+
+  @impl true
+  def handle_info(:timer_tick, state) do
+    case Session.update_round_time(state.session, 1) do
+      {:ok, session} ->
+        PubSub.broadcast(Rummy.PubSub, topic(session.id), {:session_updated, :round_time_updated})
+        {:noreply, %{state | session: session}}
+
+      _ ->
+        {:noreply, state}
+    end
   end
 
   @impl true
@@ -79,8 +92,19 @@ defmodule Rummy.Server do
     |> Session.add_player(player_name)
     |> broadcast(state.session.id, {:session_updated, :player_joined})
     |> case do
-      {:ok, {player, session}} -> {:reply, {:ok, player}, %{state | session: session}}
-      {:error, _reason} = err -> {:reply, err, state}
+      {:ok, {player, session}} ->
+        state = %{state | session: session}
+
+        state =
+          case session.players do
+            [_] -> restart_round_timer(state)
+            _ -> state
+          end
+
+        {:reply, {:ok, player}, state}
+
+      {:error, _reason} = err ->
+        {:reply, err, state}
     end
   end
 
@@ -98,6 +122,7 @@ defmodule Rummy.Server do
             {:stop, :normal, {:ok, session}, state}
 
           _ ->
+            # XXX Update round timer!
             {:reply, {:ok, session}, state}
         end
 
@@ -111,7 +136,15 @@ defmodule Rummy.Server do
     state.session
     |> Session.pick_tile()
     |> broadcast(state.session.id, {:session_updated, :tile_picked})
-    |> call_reply(state)
+    |> case do
+      {:ok, session} = result ->
+        state = restart_round_timer(%{state | session: session})
+
+        {:reply, result, state}
+
+      result ->
+        {:reply, result, state}
+    end
   end
 
   @impl true
@@ -132,7 +165,15 @@ defmodule Rummy.Server do
     state.session
     |> Session.end_turn()
     |> broadcast(state.session.id, {:session_updated, :turn_ended})
-    |> call_reply(state)
+    |> case do
+      {:ok, session} = result ->
+        state = restart_round_timer(%{state | session: session})
+
+        {:reply, result, state}
+
+      result ->
+        {:reply, result, state}
+    end
   end
 
   @impl true
@@ -161,4 +202,18 @@ defmodule Rummy.Server do
   end
 
   defp topic(game_id), do: "game:#{game_id}"
+
+  defp restart_round_timer(state) do
+    if not is_nil(state.round_timer) do
+      {:ok, _} = :timer.cancel(state.round_timer)
+    end
+
+    {:ok, timer} = :timer.send_interval(1000, :timer_tick)
+
+    %{
+      state
+      | round_timer: timer,
+        session: Session.reset_round_time(state.session)
+    }
+  end
 end
