@@ -70,7 +70,11 @@ defmodule RummyWeb.MainLive do
 
   @impl true
   def handle_info({:session_updated, _what}, socket) do
-    {:noreply, assign(socket, session: Server.get_session(socket.assigns.game_id))}
+    {:noreply, assign_session(socket, Server.get_session(socket.assigns.game_id))}
+  end
+
+  defp assign_session(socket, session) do
+    assign(socket, session: session)
   end
 
   defp enter_game(socket, game_id, player_name) do
@@ -79,7 +83,7 @@ defmodule RummyWeb.MainLive do
     socket
     |> assign(game_id: game_id)
     |> assign(player_id: player.id)
-    |> assign(session: Server.get_session(game_id))
+    |> assign_session(Server.get_session(game_id))
     |> assign_game_state()
   end
 
