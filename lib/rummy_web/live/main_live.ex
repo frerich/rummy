@@ -74,7 +74,23 @@ defmodule RummyWeb.MainLive do
   end
 
   defp assign_session(socket, session) do
-    assign(socket, session: session)
+    {:ok, current_player} = Rummy.Game.Session.current_player(session)
+
+    local_player = Enum.find(session.players, &(&1.id == socket.assigns.player_id))
+
+    can_pick_tile? = local_player == current_player and session.pool != []
+    can_end_turn? = local_player == current_player and Rummy.Game.Session.can_end_turn?(session)
+
+    assign(socket,
+      can_end_turn?: can_end_turn?,
+      can_pick_tile?: can_pick_tile?,
+      current_player: current_player,
+      played_sets: session.sets,
+      players: session.players,
+      rack: local_player.rack,
+      round_time: session.round_time,
+      round_state: session.state,
+    )
   end
 
   defp enter_game(socket, game_id, player_name) do
@@ -112,10 +128,6 @@ defmodule RummyWeb.MainLive do
     end
   end
 
-  defp player_by_id(session, player_id) do
-    Enum.find(session.players, &(&1.id == player_id))
-  end
-
   defp css_classes_for_set(set) do
     if Rummy.Game.Set.valid?(set) do
       "set"
@@ -126,19 +138,6 @@ defmodule RummyWeb.MainLive do
 
   defp sorted_set(set) do
     Rummy.Game.Set.sort(set)
-  end
-
-  defp current_player?(session, player_id) do
-    {:ok, current_player} = Rummy.Game.Session.current_player(session)
-    current_player.id == player_id
-  end
-
-  defp can_pick_tile?(session, player_id) do
-    current_player?(session, player_id) and session.pool != []
-  end
-
-  defp can_end_turn?(session, player_id) do
-    current_player?(session, player_id) and Rummy.Game.Session.can_end_turn?(session)
   end
 
   defp parse_set_id("new_set"), do: :new_set

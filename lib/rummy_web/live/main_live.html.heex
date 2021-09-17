@@ -25,12 +25,9 @@
 <div id="tileContainer" phx-hook="TileContainer">
 <section class="players">
   <ul>
-    <%= for player <- Enum.sort(@session.players) do %>
-      <li class={if current_player?(@session, player.id), do: :current}>
+    <%= for player <- Enum.sort(@players) do %>
+      <li class={if player == @current_player, do: :current}>
         <div class="player_name"><%= player.name %></div>
-        <%= if current_player?(@session, player.id) do %>
-            <div class="round_time">Thinking for <%= @session.round_time %> seconds...</div>
-        <% end %>
         <div>
         <%= if length(player.rack) <= 14 do %>
           <%= for tile <- player.rack do %>
@@ -53,7 +50,7 @@
 </section>
 
 <div id="played_sets">
-<%= for {set, set_index} <- Enum.reverse(Enum.with_index(@session.sets)) do %>
+<%= for {set, set_index} <- Enum.reverse(Enum.with_index(@played_sets)) do %>
 <div class={css_classes_for_set(set)} id={"set-#{set_index}"} data-set-index={set_index} phx-hook="SetHook">
   <%= for tile <- sorted_set(set) do %>
     <div id={"tile-#{tile.id}"} data-set-index={set_index} data-tile-id={tile.id} draggable="true" class={["tile", tile.color]} phx-hook="TileHook"><%= if tile.value == :joker, do: "🃏", else: tile.value %></div>
@@ -65,16 +62,16 @@
 
 <h2>Your Rack</h2>
 <div id="rack" data-set-index="rack" phx-hook="SetHook">
-  <%= for tile <- player_by_id(@session, @player_id).rack do %>
+  <%= for tile <- @rack do %>
     <div id={"rack-tile-#{tile.id}"} data-set-index="rack" data-tile-id={tile.id} draggable="true" class={["tile", tile.color]} phx-hook="TileHook"><%= if tile.value == :joker, do: "🃏", else: tile.value %></div>
   <% end %>
 </div>
 
 <div id="action_bar">
-<%= if @session.state == :round_start do %>
-  <button phx-click="pick-tile" disabled={unless can_pick_tile?(@session, @player_id), do: "disabled"}>Pick from Pool</button>
+<%= if @round_state == :round_start do %>
+  <button phx-click="pick-tile" disabled={unless @can_pick_tile?, do: "disabled"}>Pick from Pool</button>
 <% else %>
-  <button phx-click="end-turn" disabled={unless can_end_turn?(@session, @player_id), do: "disabled"}>End Turn</button>
+  <button phx-click="end-turn" disabled={unless @can_end_turn?, do: "disabled"}>End Turn</button>
 <% end %>
 </div>
 </div>
