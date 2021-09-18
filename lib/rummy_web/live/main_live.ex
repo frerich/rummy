@@ -3,10 +3,13 @@ defmodule RummyWeb.MainLive do
 
   alias Rummy.Server
 
+  @version Mix.Project.config[:version]
+
   @impl true
   def mount(params, _session, socket) do
     socket =
       socket
+      |> assign(version: @version)
       |> assign(flash_message: nil)
       |> assign(game_id: Map.get(params, "game_id"))
       |> assign(player_id: nil)
