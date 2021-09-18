@@ -4,7 +4,7 @@ defmodule Rummy.MixProject do
   def project do
     [
       app: :rummy,
-      version: git_describe(),
+      version: System.get_env("GIT_VERSION") || git_describe(),
       elixir: "~> 1.7",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
@@ -24,7 +24,7 @@ defmodule Rummy.MixProject do
   # SHA of HEAD is returned, e.g. "0.1.0-dev+72c26ac".
   #
   def git_describe() do
-    {output, 0} = System.cmd("git", ["describe", "--tags", "--long", "--always"])
+    {output, 0} = System.cmd("git", ["describe", "--tags", "--long", "--always", "HEAD"])
 
     case Regex.run(~r{(.+)-(\d+)-g([0-9a-f]+)\n}, output) do
       [_, tag, "0", sha] -> "#{tag}+#{sha}"
@@ -77,7 +77,13 @@ defmodule Rummy.MixProject do
   defp aliases do
     [
       setup: ["deps.get", "cmd npm install --prefix assets"],
-      "assets.deploy": ["esbuild default --minify", "phx.digest"]
+      "assets.deploy": ["esbuild default --minify", "phx.digest"],
+      deploy: &deploy_to_gigalixir/1
     ]
+  end
+
+  defp deploy_to_gigalixir(_args) do
+    System.cmd("gigalixir", ["config:set", "GIT_VERSION=#{project()[:version]}"])
+    System.cmd("git", ["push", "-f", "gigalixir", "HEAD"])
   end
 end
