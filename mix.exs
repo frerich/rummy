@@ -4,7 +4,7 @@ defmodule Rummy.MixProject do
   def project do
     [
       app: :rummy,
-      version: "0.1.0",
+      version: git_describe(),
       elixir: "~> 1.7",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
@@ -12,6 +12,25 @@ defmodule Rummy.MixProject do
       aliases: aliases(),
       deps: deps()
     ]
+  end
+
+  # Massage 'git describe' output into SemVer compatible format.
+  #
+  # If there's a tag pointing at HEAD, the returned version is in the format
+  # "<tag>+<sha>", e.g. "0.4.2+72c26ac". Otherwise, the most recent tag on the
+  # branch is chosen and a "-dev" suffix is appended, e.g. "0.4.2-dev+72c26ac".
+  #
+  # If there are no tags for any commits on the branch, a dummy version and the
+  # SHA of HEAD is returned, e.g. "0.1.0-dev+72c26ac".
+  #
+  def git_describe() do
+    {output, 0} = System.cmd("git", ["describe", "--tags", "--long", "--always"])
+
+    case Regex.run(~r{(.+)-(\d+)-g([0-9a-f]+)\n}, output) do
+      [_, tag, "0", sha] -> "#{tag}+#{sha}"
+      [_, tag, _n, sha] -> "#{tag}-dev+#{sha}"
+      nil -> "0.1.0-dev+#{String.trim_trailing(output)}"
+    end
   end
 
   # Configuration for the OTP application.
