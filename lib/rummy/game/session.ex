@@ -25,7 +25,7 @@ defmodule Rummy.Game.Session do
   def add_player(session, player_name) do
     {rack, pool} = Enum.split(session.pool, @initial_number_of_tiles)
 
-    player_id = Enum.random(1..1_0000_000)
+    player_id = Enum.random(1..10_000_000)
     player = Player.new(player_id, player_name, rack)
 
     session = %{session | pool: pool, players: session.players ++ [player]}
