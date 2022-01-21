@@ -3,8 +3,8 @@ defmodule Rummy.Server do
 
   use GenServer, restart: :transient
 
-  alias Rummy.Game.Session
   alias Phoenix.PubSub
+  alias Rummy.Game.Session
 
   def start do
     id = generate_server_id()

@@ -1,7 +1,7 @@
 defmodule Rummy.SetTest do
   use ExUnit.Case, async: true
 
-  alias Rummy.Game.{Tile, Set}
+  alias Rummy.Game.{Set, Tile}
 
   describe "Set.run?/1" do
     test "a simple valid run" do
