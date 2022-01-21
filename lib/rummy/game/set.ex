@@ -1,4 +1,6 @@
 defmodule Rummy.Game.Set do
+  @moduledoc false
+
   def run?(tiles) do
     numbered = only_numbered(tiles)
 

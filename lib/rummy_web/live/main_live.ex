@@ -1,4 +1,6 @@
 defmodule RummyWeb.MainLive do
+  @moduledoc false
+
   use RummyWeb, :live_view
 
   alias Rummy.Server

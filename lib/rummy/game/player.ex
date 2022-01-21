@@ -1,4 +1,6 @@
 defmodule Rummy.Game.Player do
+  @moduledoc false
+
   defstruct [:id, :name, :rack, :played_initial_30?]
 
   def new(id, name, rack) when is_integer(id) and is_list(rack) do

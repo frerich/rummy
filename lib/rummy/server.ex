@@ -1,4 +1,6 @@
 defmodule Rummy.Server do
+  @moduledoc false
+
   use GenServer, restart: :transient
 
   alias Rummy.Game.Session

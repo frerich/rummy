@@ -1,4 +1,6 @@
 defmodule Rummy.Game.Tile do
+  @moduledoc false
+
   @colors ~w(blue red orange black)a
   @values 1..13
 

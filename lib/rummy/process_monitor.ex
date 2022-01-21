@@ -1,4 +1,6 @@
 defmodule Rummy.ProcessMonitor do
+  @moduledoc false
+
   use GenServer
 
   def start_link(_params) do

@@ -1,4 +1,6 @@
 defmodule Rummy.Game.Session do
+  @moduledoc false
+
   alias Rummy.Game.{Player, Set}
 
   defstruct id: nil,
