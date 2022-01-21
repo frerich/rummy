@@ -15,23 +15,43 @@ jobs:
     name: Build and test
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        elixir: [1.12.3]
+        otp: [24.1]
+
     steps:
     - uses: actions/checkout@v2
+
     - name: Set up Elixir
       uses: erlef/setup-beam@988e02bfe678367a02564f65ca2e37726dc0268f
       with:
-        elixir-version: '1.12.3' # Define the elixir version [required]
-        otp-version: '24.1' # Define the OTP version [required]
-    - name: Restore dependencies cache
+        elixir-version: ${{ matrix.elixir }}
+        otp-version: ${{ matrix.otp }}
+
+    - name: Restore cached dependencies and build artifacts
       uses: actions/cache@v2
       with:
-        path: deps
-        key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
-        restore-keys: ${{ runner.os }}-mix-
+        path: |
+          deps
+          _build
+        key: mix-${{ runner.os }}-${{ matrix.elixir }}-${{ matrix.otp }}-${{ hashFiles('**/mix.lock') }}
+
     - name: Install dependencies
       run: mix deps.get
+
     - name: Check Formatting
       run: mix format --check-formatted
+
+    - name: Check for unused dependencies
+      run: mix deps.unlock --check-unused
+
+    - name: Compile dependencies
+      run: mix deps.compile
+
+    - name: Compile sources
+      run: mix compile --warnings-as-errors
+
     - name: Run Credo
       run: mix credo --strict
 
