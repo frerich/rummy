@@ -49,7 +49,7 @@ jobs:
         mix dialyzer --plt
 
     - name: Run dialyzer
-      run: MIX_ENV=dev mix dialyzer --no-check --halt-exit-status
+      run: mix dialyzer --no-check --halt-exit-status
 
     - name: Run tests
       run: mix test
