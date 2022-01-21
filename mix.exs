@@ -10,7 +10,8 @@ defmodule Rummy.MixProject do
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      dialyzer: dialyzer()
     ]
   end
 
@@ -64,7 +65,8 @@ defmodule Rummy.MixProject do
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
-      {:esbuild, "~> 0.2", runtime: Mix.env() == :dev}
+      {:esbuild, "~> 0.2", runtime: Mix.env() == :dev},
+      {:dialyxir, "~> 1.0", only: [:dev], runtime: false}
     ]
   end
 
@@ -85,5 +87,12 @@ defmodule Rummy.MixProject do
   defp deploy_to_gigalixir(_args) do
     System.cmd("gigalixir", ["config:set", "GIT_VERSION=#{project()[:version]}"])
     System.cmd("git", ["push", "-f", "gigalixir", "HEAD"])
+  end
+
+  defp dialyzer do
+    [
+      plt_core_path: "priv/plts",
+      plt_file: {:no_warn, "priv/plts/dialyzer.plt"}
+    ]
   end
 end
