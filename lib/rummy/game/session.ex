@@ -106,26 +106,49 @@ defmodule Rummy.Game.Session do
       with {:ok, {tile, session}} <- take_tile(session, tile_id, src_set),
            {:ok, session} <- put_tile(session, tile, dest_set) do
         session =
-          case {src_set, dest_set} do
-            {:rack, :new_set} ->
-              %{session | tiles_played_in_round: [tile_id | tiles_played], state: :tile_moved}
+          session
+          |> update_state_after_tile_move(src_set, tile_id, dest_set)
+          |> purge_empty_sets()
 
-            {:rack, set_index} when is_integer(set_index) ->
-              %{session | tiles_played_in_round: [tile_id | tiles_played], state: :tile_moved}
-
-            {set_index, :rack} when is_integer(set_index) ->
-              case List.delete(tiles_played, tile_id) do
-                [] -> %{session | tiles_played_in_round: [], state: :round_start}
-                tiles -> %{session | tiles_played_in_round: tiles, state: :tile_moved}
-              end
-
-            _ ->
-              %{session | state: :tile_moved}
-          end
-
-        {:ok, purge_empty_sets(session)}
+        {:ok, session}
       end
     end
+  end
+
+  defp update_state_after_tile_move(
+         %{tiles_played_in_round: tiles_played} = session,
+         :rack,
+         tile_id,
+         :new_set
+       ) do
+    %{session | tiles_played_in_round: [tile_id | tiles_played], state: :tile_moved}
+  end
+
+  defp update_state_after_tile_move(
+         %{tiles_played_in_round: tiles_played} = session,
+         :rack,
+         tile_id,
+         dest_set
+       )
+       when is_integer(dest_set) do
+    %{session | tiles_played_in_round: [tile_id | tiles_played], state: :tile_moved}
+  end
+
+  defp update_state_after_tile_move(
+         %{tiles_played_in_round: tiles_played} = session,
+         src_set,
+         tile_id,
+         :rack
+       )
+       when is_integer(src_set) do
+    case List.delete(tiles_played, tile_id) do
+      [] -> %{session | tiles_played_in_round: [], state: :round_start}
+      tiles -> %{session | tiles_played_in_round: tiles, state: :tile_moved}
+    end
+  end
+
+  defp update_state_after_tile_move(session, _set_set, _tile_id, _dest_set) do
+    %{session | state: :tile_moved}
   end
 
   def reset_round_time(session) do
