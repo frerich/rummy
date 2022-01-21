@@ -3,7 +3,7 @@ defmodule RummyWeb.MainLive do
 
   alias Rummy.Server
 
-  @version Mix.Project.config[:version]
+  @version Mix.Project.config()[:version]
 
   @impl true
   def mount(params, _session, socket) do
@@ -92,7 +92,7 @@ defmodule RummyWeb.MainLive do
       players: session.players,
       rack: local_player.rack,
       round_time: session.round_time,
-      round_state: session.state,
+      round_state: session.state
     )
   end
 
