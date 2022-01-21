@@ -3,6 +3,7 @@ defmodule RummyWeb.MainLive do
 
   use RummyWeb, :live_view
 
+  alias Rummy.Game.Session
   alias Rummy.Server
 
   @version Mix.Project.config()[:version]
@@ -79,12 +80,12 @@ defmodule RummyWeb.MainLive do
   end
 
   defp assign_session(socket, session) do
-    {:ok, current_player} = Rummy.Game.Session.current_player(session)
+    {:ok, current_player} = Session.current_player(session)
 
     local_player = Enum.find(session.players, &(&1.id == socket.assigns.player_id))
 
     can_pick_tile? = local_player == current_player and session.pool != []
-    can_end_turn? = local_player == current_player and Rummy.Game.Session.can_end_turn?(session)
+    can_end_turn? = local_player == current_player and Session.can_end_turn?(session)
 
     assign(socket,
       can_end_turn?: can_end_turn?,

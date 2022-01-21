@@ -1,7 +1,7 @@
 defmodule Rummy.Game.Session do
   @moduledoc false
 
-  alias Rummy.Game.{Player, Set}
+  alias Rummy.Game.{Player, Set, Tile}
 
   defstruct id: nil,
             players: [],
@@ -16,7 +16,7 @@ defmodule Rummy.Game.Session do
   def new(id) do
     %__MODULE__{
       id: id,
-      pool: Enum.shuffle(Rummy.Game.Tile.pool())
+      pool: Enum.shuffle(Tile.pool())
     }
   end
 
