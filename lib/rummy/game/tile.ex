@@ -6,7 +6,7 @@ defmodule Rummy.Game.Tile do
 
   defstruct [:id, :color, :value]
 
-  def new(id, color, value) when color in @colors and (value in @values or value == :joker) do
+  def new(id, color, value) when color in @colors and (value == :joker or value in @values) do
     %__MODULE__{id: id, color: color, value: value}
   end
 
