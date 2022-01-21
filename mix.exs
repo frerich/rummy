@@ -2,6 +2,8 @@ defmodule Rummy.MixProject do
   use Mix.Project
 
   def project do
+    {dialyzer_options, []} = Code.eval_file("dialyzer_options.exs")
+
     [
       app: :rummy,
       version: System.get_env("GIT_VERSION") || git_describe(),
@@ -11,7 +13,7 @@ defmodule Rummy.MixProject do
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
-      dialyzer: dialyzer()
+      dialyzer: dialyzer_options
     ]
   end
 
@@ -87,13 +89,5 @@ defmodule Rummy.MixProject do
   defp deploy_to_gigalixir(_args) do
     System.cmd("gigalixir", ["config:set", "GIT_VERSION=#{project()[:version]}"])
     System.cmd("git", ["push", "-f", "gigalixir", "HEAD"])
-  end
-
-  defp dialyzer do
-    [
-      plt_add_apps: [:ex_unit],
-      plt_core_path: "priv/plts",
-      plt_file: {:no_warn, "priv/plts/dialyzer.plt"}
-    ]
   end
 end
