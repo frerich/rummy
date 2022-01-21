@@ -10,7 +10,7 @@ defmodule Rummy.Game.Tile do
     %__MODULE__{id: id, color: color, value: value}
   end
 
-  def pool() do
+  def pool do
     numbered = for color <- @colors, value <- @values, do: {color, value}
 
     jokers = [{:black, :joker}, {:orange, :joker}]

@@ -6,7 +6,7 @@ defmodule Rummy.Server do
   alias Rummy.Game.Session
   alias Phoenix.PubSub
 
-  def start() do
+  def start do
     id = generate_server_id()
 
     case DynamicSupervisor.start_child(
@@ -187,7 +187,7 @@ defmodule Rummy.Server do
     {:via, Registry, {Rummy.Server.Registry, id}}
   end
 
-  defp generate_server_id() do
+  defp generate_server_id do
     ?a..?z |> Enum.take_random(6) |> List.to_string()
   end
 
