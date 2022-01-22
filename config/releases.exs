@@ -1,3 +1,5 @@
+import Config
+
 config :rummy, RummyWeb.Endpoint,
   server: true,
   http: [port: {:system, "PORT"}],
