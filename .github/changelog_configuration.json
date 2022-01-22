@@ -1,0 +1,20 @@
+{
+    "categories": [
+        {
+            "title": "## 🚀 Enhancements",
+            "labels": ["enhancement"]
+        },
+        {
+            "title": "## 🐛 Fixes",
+            "labels": ["bug"]
+        },
+        {
+            "title": "## 📖 Documentation",
+            "labels": ["documentation"]
+        },
+        {
+            "title": "## 💬 Other",
+            "labels": ["other"]
+        }
+    ]
+}

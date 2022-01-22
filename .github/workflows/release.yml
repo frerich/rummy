@@ -10,9 +10,13 @@ jobs:
     name: Create Release
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
+
       - name: Build Changelog
         id: github_release
         uses: mikepenz/release-changelog-builder-action@v1
+        with:
+          configuration: ".github/changelog_configuration.json"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
