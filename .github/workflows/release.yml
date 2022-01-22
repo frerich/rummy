@@ -39,13 +39,12 @@ jobs:
         ref: main # Check out main instead of the latest commit
         fetch-depth: 0 # Checkout the whole branch
 
-    - uses: actions/setup-python@v2
-      with:
-        python-version: 3.8.1
+    - name: Install Gigalixir CLI
+      run: pip install gigalixir
 
-    - uses: mhanberg/gigalixir-action@v0.6.1
-      with:
-        GIGALIXIR_APP: rummy
-        GIGALIXIR_USERNAME: ${{ secrets.GIGALIXIR_USERNAME }}
-        GIGALIXIR_PASSWORD: ${{ secrets.GIGALIXIR_PASSWORD }}
-        MIGRATIONS: false
+    - name: Deploy
+      run: |
+        gigalixir login -e "${{ secrets.GIGALIXIR_USERNAME }}" -y -p "${{ secrets.GIGALIXIR_PASSWORD }}"
+        gigalixir git:remote rummy
+        gigalixir config:set "GIT_VERSION=${{ github.ref }}"
+        git push -f gigalixir HEAD:refs/heads/main
