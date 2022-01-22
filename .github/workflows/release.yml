@@ -32,7 +32,6 @@ jobs:
   deploy:
     name: Deploy to Gigalixir
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' # Only run this job if it is on the main branch
     needs: release
     steps:
     - uses: actions/checkout@v2
