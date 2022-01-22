@@ -47,4 +47,4 @@ jobs:
         gigalixir login -e "${{ secrets.GIGALIXIR_USERNAME }}" -y -p "${{ secrets.GIGALIXIR_PASSWORD }}"
         gigalixir git:remote rummy
         gigalixir config:set "GIT_VERSION=${{ github.ref_name }}"
-        git push -f gigalixir HEAD:refs/heads/main
+        git push -f gigalixir HEAD
