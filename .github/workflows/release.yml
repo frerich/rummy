@@ -28,3 +28,20 @@ jobs:
           body: ${{steps.github_release.outputs.changelog}}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy:
+    name: Deploy to Gigalixir
+    needs: release
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions/setup-python@v2
+      with:
+        python-version: 3.8.1
+
+    - uses: mhanberg/gigalixir-action@v0.6.1
+      with:
+        GIGALIXIR_APP: rummy
+        GIGALIXIR_USERNAME: ${{ secrets.GIGALIXIR_USERNAME }}
+        GIGALIXIR_PASSWORD: ${{ secrets.GIGALIXIR_PASSWORD }}
+        MIGRATIONS: false
