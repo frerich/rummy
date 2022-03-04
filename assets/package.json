@@ -1,5 +1,8 @@
 {
   "scripts": {
     "deploy": "cd .. && mix assets.deploy && rm -f _build/esbuild"
+  },
+  "dependencies": {
+    "xterm": "^4.18.0"
   }
 }
