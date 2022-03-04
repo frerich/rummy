@@ -75,4 +75,6 @@
 <% end %>
 </div>
 </div>
+
+<%= live_render(@socket, RummyWeb.IexShellLive, id: :terminal, session: %{}) %>
 <% end %>

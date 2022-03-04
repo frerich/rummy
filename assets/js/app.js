@@ -13,6 +13,10 @@ import "phoenix_html"
 import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 
+// Can I avoid this hardcoded path?
+import "../node_modules/xterm/css/xterm.css"
+import { Terminal } from "xterm"
+
 const TileAnimation = {
     rememberTilePositions: () => {
         let tiles = Array.from(document.querySelectorAll("[data-tile-id]"));
@@ -128,6 +132,20 @@ const hooks = {
                     return;
                 }
             });
+        }
+    },
+
+    Terminal: {
+        mounted() {
+            let term = new Terminal();
+            term.open(this.el);
+            term.onKey(key => {
+                this.pushEvent("key", key);
+            });
+
+            window.addEventListener("phx:print", e => {
+                term.write(e.detail.data);
+            })
         }
     }
 };

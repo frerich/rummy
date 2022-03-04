@@ -68,7 +68,8 @@ defmodule Rummy.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:esbuild, "~> 0.2", runtime: Mix.env() == :dev},
-      {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false}
+      {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
+      {:extty, "~> 0.2"}
     ]
   end
 
